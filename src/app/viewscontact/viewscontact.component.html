@@ -1,0 +1,127 @@
+<div class="list row">
+    <div class="col-md-8">
+      <div class="input-group mb-3">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Search by Id, FirstName, LastName or Email"
+          [(ngModel)]="searchText"
+          (input)="Search($event)"
+        />
+      </div>
+    </div>
+<div class="col-md-12">
+      <h4>Contact List</h4>
+
+    
+      <button class="btn btn-sm btn-success mb-2" (click)="Add()">Add New</button>
+      <div class="card m-3">
+       
+            <table class="table table-striped table-sm">
+                <thead>
+                    <tr>
+                        <th><a (click)="sortBy('id')" style="cursor: pointer;">Id {{sortIcon('id')}}</a></th>
+                        <th><a (click)="sortBy('firstName')" style="cursor: pointer;">FirstName {{sortIcon('firstName')}}</a></th>
+                        <th><a (click)="sortBy('lastName')" style="cursor: pointer;">LastName {{sortIcon('lastName')}}</a></th>
+                        <th><a (click)="sortBy('email')" style="cursor: pointer;">Email {{sortIcon('email')}}</a></th>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of pageOfItems">
+                        <td>{{item.id}}</td>
+                        <td>{{item.firstName}}</td>
+                        <td>{{item.lastName}}</td>
+                        <td>{{item.email}}</td>
+      
+                        <td>  <a  class="btn btn-sm btn-success" (click)="Editcontact(item.id)"><i class="fa fa-edit" aria-hidden="true"></i></a></td>
+                        <td>  <a  class="btn btn-sm btn-danger" (click)="deletecontact(item.id)" ><i class="fa fa-trash" aria-hidden="true"></i></a></td>
+                      </tr>
+                    <tr *ngIf="loading">
+                        <td colspan="5" class="text-center py-5">
+                            <span class="spinner-border spinner-border-lg align-center"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+       
+         <div class="card-footer pb-0 pt-3">
+            <pagination [items]="items" (changePage)="onChangePage($event)" ></pagination>
+        </div> 
+    
+</div>
+
+
+  </div>
+
+
+
+<modal id="modal-2">
+    <div class="modal-header">
+        <h5 class="modal-title">{{addUpdateText}}</h5>
+        <button type="button" class="btn-close" (click)="modalService.close();"></button>
+    </div>
+    <div class="modal-body">
+      <div>
+
+            <div class="form-group" *ngIf="contactModel.Id != 0">
+              <label for="title">ID</label>
+              <input
+                type="text"
+                class="form-control"
+                id="id"
+                disabled
+                [(ngModel)]="contactModel.Id"
+                name="Id"
+              />
+            </div>
+                <div class="form-group">
+                  <label for="title">FirstName</label><span style="color: red;">*</span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="FirstName"
+                    required
+                    [(ngModel)]="contactModel.FirstName"
+                    name="FirstName"
+                  />
+                </div>
+          
+                <div class="form-group">
+                  <label for="description">LastName</label><span style="color: red;">*</span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="LastName"
+                    required
+                    [(ngModel)]="contactModel.LastName"
+                    name="LastName"
+                  />
+          
+                  <div class="form-group">
+                      <label for="description">Email</label><span style="color: red;">*</span>
+                      <input
+                        class="form-control"
+                        id="Email"
+                        required
+                        [(ngModel)]="contactModel.Email"
+                        name="Email"
+                        type="email"
+                        #emailref="ngModel"
+                        [email]="true"
+                      />
+                      <div *ngIf="emailref.errors &&(emailref.touched || emailref.dirty)" class ="alert alert-danger">
+                        Invalid email
+                     </div>
+                </div>
+  
+              </div>
+            </div>
+    </div>
+    <div class="modal-footer">
+        <button  (click)="save()" class="btn btn-success" [disabled]="!contactModel.FirstName || !contactModel.LastName || !contactModel.Email || emailref.errors">{{buttontext}}</button>
+        <button type="button" class="btn btn-secondary" (click)="modalService.close();">Close</button>
+    </div>
+</modal>
+  
