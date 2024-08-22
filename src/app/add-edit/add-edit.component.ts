@@ -12,7 +12,9 @@ import {AlertService} from '../_Service/alert.service'
 })
 export class AddEditComponent {
   form!: FormGroup;
+// myForm: FormGroup;
   id?: string;
+  Isedit=false;
   title!: string;
   loading = false;
   submitting = false;
@@ -39,18 +41,19 @@ export class AddEditComponent {
  });
 }
   ngOnInit() {
+
+    debugger;
     this.id = this.route.snapshot.params['id'];
     this.form = this.formBuilder.group({
         firstName: ['', Validators.required],
         lastName: ['', Validators.required],
-        email: ['', [Validators.required, Validators.email]],
+        email: ['', Validators.required],
         id:0
         });
 
     this.title = 'Add Contact';
     if (this.id) {
-        debugger;
-        // edit mode
+      this.Isedit=true;
         this.title = 'Edit Contact';
         this.loading = true;
        
@@ -67,7 +70,6 @@ export class AddEditComponent {
               email:filter_array[0].email,
               id:filter_array[0].id,
             })
-
           },
           error: (httpError: HttpErrorResponse) => {
               debugger;
@@ -81,24 +83,29 @@ export class AddEditComponent {
     {
 
     }
+
+
+}
+
+protected get contactFormControl() {
+  debugger;
+  return this.form.controls;
 }
 
 onSubmit() {
 
   this.submitted = true;
-
-  // stop here if form is invalid
   if (this.form.invalid) {
-    return;
+      return;
   }
 
   this.submitting = true;
-  
+ 
   if(this.title =="Add Contact")
     {
       this.contactService.Create(this.form.value).subscribe({
         next: (res) => {
-          this.alertService.success('Contact added successfully', { keepAfterRouteChange: true,autoClose:true });
+          this.alertService.success('Added Contact', { keepAfterRouteChange: true,autoClose:true });
           this.router.navigateByUrl('/View');
         
         },
@@ -111,7 +118,7 @@ onSubmit() {
         debugger;
         this.contactService.Update(this.form.value).subscribe({
           next: (res) => {
-            this.alertService.success('Contact updated successfully', { keepAfterRouteChange: true,autoClose:true });
+            this.alertService.success('Updated Contact', { keepAfterRouteChange: true,autoClose:true });
             this.router.navigateByUrl('/View');
           },
           error: (e) => console.error(e)

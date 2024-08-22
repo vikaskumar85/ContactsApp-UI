@@ -1,11 +1,11 @@
 import { Component ,OnInit} from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { environment } from 'src/environments/environment';
 import {ContactService} from '../_Service/contact.service'
 import {AlertService} from '../_Service/alert.service'
+import { ModalService } from '../_Service/modal.service';
 import {ContactModel} from '../_model/contact-model.model';
-import { FormGroup } from '@angular/forms';
-import { map } from 'rxjs/operators';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
 @Component({
   selector: 'app-viewscontact',
   templateUrl: './viewscontact.component.html',
@@ -13,12 +13,20 @@ import { map } from 'rxjs/operators';
 })
 export class ViewscontactComponent implements OnInit {
   form!: FormGroup;
+  id?: string;
+  Isedit=false;
+  title!: string;
+
+  submitting = false;
+  submitted = false;
+
   items: any[] = [];
   previtems: any[] = [];
   pageOfItems?: Array<any>;
   sortProperty: string = 'id';
   sortOrder = 1;
   loading = false;
+
   buttontext="Save"
   addUpdateText="Add Contact"
   searchText=""
@@ -36,7 +44,17 @@ export class ViewscontactComponent implements OnInit {
   };
 
 
-  constructor(private  contactService: ContactService, private alertService: AlertService,private http: HttpClient) {}
+  constructor(private  contactService: ContactService, private alertService: AlertService,private http: HttpClient,protected modalService: ModalService,  private fb: FormBuilder, private formBuilder: FormBuilder
+ 
+    ) {
+    this.form = this.fb.group({
+      id:0,
+      firstName: '',
+      lastName: '',
+      email: '',
+   });
+
+  }
 
   ngOnInit() {
     const params = this.getRequestParams(this.page, this.pageSize);
@@ -59,6 +77,70 @@ export class ViewscontactComponent implements OnInit {
               console.error(`Endpoint returned error ${errorValue} with status code ${errorCode}`)
           }
         });
+           
+  }
+
+protected get contactFormControl() {
+  debugger;
+  return this.form.controls;
+}
+
+protected get name() {
+  return this.form.get('firstName');
+}
+
+onSubmit() {
+
+  this.submitted = true;
+ 
+  if (this.form.invalid) {
+      return;
+  }
+
+  this.submitting = true;
+
+
+  if(this.title =="Add Contact")
+  {
+    debugger;
+    this.contactService.Create(this.form.value).subscribe({
+      next: (res) => {
+        this.loading = false;
+        this.submitting = false;
+        this.submitted = false;
+
+       
+         this.alertService.success("Record Saved",{autoClose:true});
+       this.modalService.close();
+       this.ngOnInit() ;
+      
+      },
+      error: (e) => console.error(e)
+    });
+  }
+
+  if(this.title =="Edit Contact")
+    {
+      debugger;
+      this.contactService.Update(this.form.value).subscribe({
+        next: (res) => {
+          this.form = this.fb.group({
+            id:0,
+            firstName: '',
+            lastName: '',
+            email: '',
+         });
+         this.submitted = false;
+         this.submitting = false;
+         this.loading=false; 
+          this.alertService.success("Record updated",{autoClose:true});
+          this.modalService.close();
+          this.ngOnInit() ;
+        },
+        error: (e) => console.error(e)
+      });
+    }
+
 }
 
 getRequestParams(page: number, pageSize: number): any {
@@ -75,8 +157,8 @@ if (page) {
 }
 
 onChangePage(pageOfItems: Array<any>) {
-  // update current page of items
-  this.pageOfItems = pageOfItems;
+ 
+    this.pageOfItems = pageOfItems;
 }
 
 sortBy(property: string) {
@@ -102,6 +184,27 @@ sortIcon(property: string) {
   return '';
 }
 
+
+Add(): void {
+  
+  this.title = 'Add Contact';
+  this.buttontext="Save";
+  this.submitted = false;
+  this.submitting = false;
+  this.loading=false;
+
+   this.form = this.formBuilder.group({
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      email: ['', Validators.required],
+      id:0
+      });
+  this.modalService.open('modal-2');
+ 
+}
+
+ 
+
 Search(event: any): void {
   var searchVal = event.target.value;
   if (searchVal == null || searchVal.trim() === ''){
@@ -125,7 +228,8 @@ deletecontact(id: string) {
         next: (response) => {
           if(response){
                this.alertService.success("Record deleted",{autoClose:true});
-               this.ngOnInit();
+               this.modalService.close();
+               this.ngOnInit() ;
             }
             else{
                this.alertService.error("Record not deleted",{autoClose:true});
@@ -135,4 +239,22 @@ deletecontact(id: string) {
       });
 }
 
+Editcontact(userId: string) {
+ this.buttontext="Update"
+ this.title="Edit Contact"
+ var result = this.items.find(o => o.id === userId);
+ this.form.patchValue({
+        firstName:result.firstName ,
+        lastName:result.lastName,
+        email:result.email,
+        id:result.id,
+      })
+
+this.modalService.open('modal-2')
+
 }
+
+
+}
+
+

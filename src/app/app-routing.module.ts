@@ -8,6 +8,8 @@ const routes: Routes = [
   { path: 'View', component: ViewscontactComponent},
   { path: 'add', component: AddEditComponent},
   { path: 'edit/:id', component: AddEditComponent }
+
+
 ];
 
 @NgModule({

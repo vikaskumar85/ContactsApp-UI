@@ -1,4 +1,4 @@
-<h1>{{title}}</h1>
+<h1>{{title}} </h1>
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <!-- <label for="name">firstName:</label>
        <input type="text" id="firstName" formControlName="firstName">
@@ -22,8 +22,12 @@
                 />
               </div>
 
-                <div class="form-group">
-                  <label for="title">FirstName</label><span style="color: red;">*</span>
+                <div class="form-group was-validated  mb-2" 
+                [ngClass]="{ 'form-group was-validated  mb-2': (contactFormControl.firstName.touched || submitted) &&
+                contactFormControl.firstName.errors?.['required'], 'form-group': !(contactFormControl.firstName.touched || submitted) &&
+                contactFormControl.firstName.errors?.['required'] }"
+                >
+                  <label for="title">FirstName </label><span style="color: red;">*</span>
                   <input
                     type="text"
                     class="form-control"
@@ -32,9 +36,22 @@
                     formControlName="firstName"
                     name="firstName"
                   />
+
+                  
                 </div>
+                <span
+                class="text-danger"
+                *ngIf="
+                    (contactFormControl.firstName.touched || submitted) &&
+                    contactFormControl.firstName.errors?.['required']"
+              >
+                FirstName is required
+              </span>
+  
           
-                <div class="form-group">
+                <div  [ngClass]="{ 'form-group was-validated  mb-2': (contactFormControl.lastName.touched || submitted) &&
+                contactFormControl.lastName.errors?.['required'], 'form-group': !(contactFormControl.lastName.touched || submitted) &&
+                contactFormControl.lastName.errors?.['required'] }">
                   <label for="description">LastName</label><span style="color: red;">*</span>
                   <input
                     type="text"
@@ -45,12 +62,18 @@
                     name="lastName"
                   />
 
-                  <!-- <div *ngIf="form.get('lastName').hasError('required') && form.get('lastName').touched">
-                    LastName is required.
-                  </div> -->
-                  <!-- <div  className={errMsg ? "" : "invalid-feedback"}>Enter UserName</div> -->
+                  <span
+                  class="text-danger"
+                  *ngIf="
+                      (contactFormControl.lastName.touched || submitted) &&
+                      contactFormControl.lastName.errors?.['required']"
+                >
+                  LastName is required
+                </span>
           
-                  <div class="form-group">
+                  <div [ngClass]="{ 'form-group was-validated  mb-2': (contactFormControl.email.touched || submitted) &&
+                  contactFormControl.email.errors?.['required'], 'form-group': !(contactFormControl.email.touched || submitted) &&
+                  contactFormControl.email.errors?.['required'] }">
                       <label for="description">Email</label><span style="color: red;">*</span>
                       <input
                         class="form-control"
@@ -62,9 +85,14 @@
                         type="email"
                         
                       />
-                      <!-- <div *ngIf="emailref.errors &&(emailref.touched || emailref.dirty)" class ="alert alert-danger">
-                        Invalid email
-                     </div> -->
+                      <span
+                  class="text-danger"
+                  *ngIf="
+                      (contactFormControl.email.touched || submitted) &&
+                      contactFormControl.email.errors?.['required']"
+                >
+                Email is required
+                </span>
                 </div>
   
               </div>

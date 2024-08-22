@@ -9,6 +9,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AlertComponent } from './_compnent/alert.component';
 
 import { PaginationComponent } from './_compnent/pagination/pagination.component'
+import { ModalComponent } from './_compnent/_modelpopup/modal.component';
 import { AddEditComponent } from './add-edit/add-edit.component';
 @NgModule({
   declarations: [
@@ -16,6 +17,7 @@ import { AddEditComponent } from './add-edit/add-edit.component';
     ViewscontactComponent,
     AlertComponent,
     PaginationComponent,
+    ModalComponent,
     AddEditComponent
   ],
   imports: [
