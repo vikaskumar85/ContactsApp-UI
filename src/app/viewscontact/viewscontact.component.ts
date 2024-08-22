@@ -3,9 +3,8 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import {ContactService} from '../_Service/contact.service'
 import {AlertService} from '../_Service/alert.service'
-import { ModalService } from '../_Service/modal.service';
 import {ContactModel} from '../_model/contact-model.model';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { map } from 'rxjs/operators';
 @Component({
   selector: 'app-viewscontact',
@@ -37,7 +36,7 @@ export class ViewscontactComponent implements OnInit {
   };
 
 
-  constructor(private  contactService: ContactService, private alertService: AlertService,private http: HttpClient,protected modalService: ModalService) {}
+  constructor(private  contactService: ContactService, private alertService: AlertService,private http: HttpClient) {}
 
   ngOnInit() {
     const params = this.getRequestParams(this.page, this.pageSize);
@@ -50,7 +49,7 @@ export class ViewscontactComponent implements OnInit {
             this.items = data.contacts;
             this.previtems = this.items;
             this.count = data.TotalNoOfContacts
-            // debugger;
+            this.onChangePage(this.items);
             this.loading = false;
           },
           error: (httpError: HttpErrorResponse) => {
@@ -76,9 +75,8 @@ if (page) {
 }
 
 onChangePage(pageOfItems: Array<any>) {
-   //alert('jgjkhh');
-    // update current page of items
-    this.pageOfItems = pageOfItems;
+  // update current page of items
+  this.pageOfItems = pageOfItems;
 }
 
 sortBy(property: string) {
@@ -104,53 +102,6 @@ sortIcon(property: string) {
   return '';
 }
 
-Add(): void {
-  this.buttontext="Save"
-  this.addUpdateText = "Add Contact"
-  this.modalService.open('modal-2');
-  this.contactModel.Id=0;
-  this.contactModel.FirstName="";
-  this.contactModel.LastName="";
-  this.contactModel.Email="";
-}
-
-save(): void {
-  const data = {
-   id: this.contactModel.Id,
-    FirstName: this.contactModel.FirstName,
-    LastName: this.contactModel.LastName,
-    Email: this.contactModel.Email,
-  };
-
-  if(this.buttontext=="Save")
-  {
-    this.contactService.Create(data).subscribe({
-      next: (res) => {
-       this.alertService.success("Record Saved",{autoClose:true});
-       this.modalService.close();
-       this.ngOnInit() ;
-      },
-      error: (e) => console.error(e)
-    });
-  }
-  else
-  {
-    this.contactService.Update(data).subscribe({
-      next: (response) => {
-        if(response){
-        this.alertService.success("Record Updated",{autoClose:true});
-        this.modalService.close();
-        this.ngOnInit() ;
-        }
-        else{
-          this.alertService.error("Record not updated",{autoClose:true});
-        }
-      },
-      error: (e) => console.error(e)
-    });
-  }
-}
-
 Search(event: any): void {
   var searchVal = event.target.value;
   if (searchVal == null || searchVal.trim() === ''){
@@ -164,6 +115,7 @@ Search(event: any): void {
       .includes(searchVal.toLowerCase()))
       );
     this.items = result;
+    this.onChangePage(this.items);
   }
 }
 
@@ -173,8 +125,7 @@ deletecontact(id: string) {
         next: (response) => {
           if(response){
                this.alertService.success("Record deleted",{autoClose:true});
-               this.modalService.close();
-               this.ngOnInit() ;
+               this.ngOnInit();
             }
             else{
                this.alertService.error("Record not deleted",{autoClose:true});
@@ -184,26 +135,4 @@ deletecontact(id: string) {
       });
 }
 
-Editcontact(userId: string) {
- 
- 
-  var result = this.items.find(o => o.id === userId);
- if(result)
- {
-  this.buttontext="Update"
-  this.addUpdateText="Update Contact"
-  this.contactModel.FirstName=result.firstName;
-  this.contactModel.Id=result.id;
-  this.contactModel.LastName=result.lastName;
-  this.contactModel.Email=result.email;
- }
-
-
-this.modalService.open('modal-2')
-
 }
-
-
-}
-
-
